@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      # Node 26 bundles npm 11; devEngines requires npm >= 12. setup-node's npm
+      # cache runs `npm config get cache` inside the repo, which devEngines
+      # rejects under npm 11, so: Node first, then npm 12 (installed outside the
+      # repo), then a second setup-node pass that only enables the cache.
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+          package-manager-cache: false
+
+      - name: Upgrade npm
+        run: npm install -g npm@12
+        working-directory: ${{ runner.temp }}
+
+      - name: Cache npm
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint:ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      # Electron itself is mocked in unit tests, so no binary download or display is needed.
+      - name: Test
+        run: npm run test:coverage

@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2023"],
+    "types": ["node"],
+    "paths": {}
+  },
+  "include": [
+    "./**/*.ts",
+    "../scripts/**/*.ts",
+    "../tsdown.config.ts",
+    "../electron-builder.config.ts"
+  ],
+  "exclude": ["../node_modules", "../dist", "../dist-electron"]
+}
