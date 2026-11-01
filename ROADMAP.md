@@ -8,15 +8,15 @@ commitments. Pick one up, or leave the repo as-is.
 ## Now — parity + hardening, no new dependencies
 
 - **Persist window size and position.**
-  *Steps:* save `getBounds()` on `close` to `userData/window-state.json` via
+  _Steps:_ save `getBounds()` on `close` to `userData/window-state.json` via
   `writeJsonFileAtomic`. Restore it in `createMainWindow`, clamped to a visible display
   (`screen.getDisplayMatching`).
-  *Done when:* resizing, quitting and relaunching restores the window, and a disconnected
+  _Done when:_ resizing, quitting and relaunching restores the window, and a disconnected
   monitor doesn't strand it off-screen.
 
 - **Guard redirects the way navigation is guarded.** `window.ts` blocks `will-navigate` but not
   `will-redirect`. The UI never redirects, so the guard is cheap insurance.
-  *Done when:* `window.test.ts` pins both.
+  _Done when:_ `window.test.ts` pins both.
 
 - **Validate the login payload with Zod.** This is the same gap as in both webapps' roadmaps, and
   `zod` is already a dependency.
@@ -30,14 +30,14 @@ commitments. Pick one up, or leave the repo as-is.
   failures on this repo's Electron + Vite 8 stack and its fixes (#932, #934) are unmerged, and the
   done-when below is unreachable as written: typecheck still needs both tsconfigs. Recheck once a
   6.0.x lands those fixes.
-  *Steps:* once `electron-vite@6` is stable, prototype it in a branch.
-  *Done when:* it replaces `scripts/dev.ts`, `tsdown.config.ts` and the two tsconfigs with less
+  _Steps:_ once `electron-vite@6` is stable, prototype it in a branch.
+  _Done when:_ it replaces `scripts/dev.ts`, `tsdown.config.ts` and the two tsconfigs with less
   code, keeping the CJS preload, inlined `VITE_API_BASE_URL` and restart-on-change. If it doesn't,
   record why here and drop the item.
 
 - **Playwright `_electron` E2E.** It covers login → restart → session restored from the keychain,
   menu → Settings, and theme persistence. The flow was verified by hand when the repo was created.
-  *Note:* the `EnableNodeCliInspectArguments` fuse is off, so Playwright can only drive unpackaged
+  _Note:_ the `EnableNodeCliInspectArguments` fuse is off, so Playwright can only drive unpackaged
   builds (`npm start`), not `release/` apps. That's intended.
 
 - **Wire up code signing.** The secrets are listed, commented out, in `release.yml`. The macOS
