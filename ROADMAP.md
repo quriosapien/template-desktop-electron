@@ -1,6 +1,6 @@
 # Roadmap — template-desktop-electron
 
-An Electron 44 desktop template with the Vue 3 UI of `template-webapp-vuejs`, a keychain-backed
+An Electron 45 desktop template with the Vue 3 UI of `template-webapp-vuejs`, a keychain-backed
 session, native settings and GitHub Releases auto-update. Its UI (`src/`) is shared with
 `template-desktop-tauri`. This roadmap is a record of intent: items here are candidates, not
 commitments. Pick one up, or leave the repo as-is.
