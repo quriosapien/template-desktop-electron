@@ -1,6 +1,6 @@
 # template-desktop-electron
 
-A production-grade Electron desktop template with a Vue 3 + TypeScript UI. It uses Electron 44, a
+A production-grade Electron desktop template with a Vue 3 + TypeScript UI. It uses Electron 45, a
 Vite 8 renderer, tsdown-built main and preload bundles, and electron-builder installers.
 
 The UI carries full parity with `template-webapp-vuejs`: JWT auth with refresh-token rotation,
@@ -17,7 +17,7 @@ The `src/` UI is shared with its sibling `template-desktop-tauri` (see
 
 | Tool                                                                                                     | Role                                                                                                                                                                      |
 | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Electron](https://www.electronjs.org) 44                                                                | Desktop shell: Chromium 152 + Node 24.21                                                                                                                                  |
+| [Electron](https://www.electronjs.org) 45                                                                | Desktop shell: Chromium 156 + Node 24.22                                                                                                                                  |
 | [Vite](https://vitejs.dev) 8                                                                             | UI dev server (HMR) and renderer build                                                                                                                                    |
 | [tsdown](https://tsdown.dev)                                                                             | Main and preload bundles, built by Rolldown (Rust). Same tool as `template-webserver-ts7`; the preload is emitted as CJS because sandboxed preloads can't load ES modules |
 | [electron-builder](https://www.electron.build)                                                           | Installers (dmg/zip, NSIS, AppImage/deb), fuses, GitHub Releases publishing                                                                                               |
@@ -48,7 +48,7 @@ npm run dev
 
 An app window opens. Sign in with `demo@example.com` / `password123`; the dev server answers with
 the mock API, so no backend is needed. The first `npm run dev` downloads the Electron binary:
-Electron 44 fetches it lazily rather than in an install script.
+Electron 45 fetches it lazily rather than in an install script.
 
 ## Scripts
 

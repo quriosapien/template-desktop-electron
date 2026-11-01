@@ -32,7 +32,7 @@ export function createTsdownConfig(mode: 'development' | 'production'): UserConf
       deps: { neverBundle: ['electron'], onlyBundle: ['zod'] },
       format: 'esm',
       fixedExtension: false, // index.js, as package.json `main` expects
-      target: 'node24', // Electron 44 embeds Node 24.21
+      target: 'node24', // Electron 45 embeds Node 24.22
     },
     {
       ...shared,
@@ -40,7 +40,7 @@ export function createTsdownConfig(mode: 'development' | 'production'): UserConf
       outDir: 'dist-electron/preload',
       // Sandboxed preloads can't load ES modules: one self-contained CJS file.
       format: 'cjs',
-      target: 'chrome152', // Electron 44 embeds Chromium 152
+      target: 'chrome156', // Electron 45 embeds Chromium 156
       outExtensions: () => ({ js: '.cjs' }),
     },
   ];
