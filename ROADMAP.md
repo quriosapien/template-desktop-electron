@@ -25,7 +25,11 @@ commitments. Pick one up, or leave the repo as-is.
 
 - **Standing item: recheck electron-vite on every sweep.** electron-vite 5 (stable) caps Vite at
   7, and 6.0 (Vite 8) was still beta when this repo was created. That's why `scripts/dev.ts` +
-  tsdown exist. Rechecked 2026-10-10: 6.0 is still beta (`6.0.0-beta.7`).
+  tsdown exist. Rechecked 2026-11-01: `6.0.0` is stable (2026-10-14) but skipped this sweep.
+  [alex8088/electron-vite#929](https://github.com/alex8088/electron-vite/issues/929) reports
+  failures on this repo's Electron + Vite 8 stack and its fixes (#932, #934) are unmerged, and the
+  done-when below is unreachable as written: typecheck still needs both tsconfigs. Recheck once a
+  6.0.x lands those fixes.
   *Steps:* once `electron-vite@6` is stable, prototype it in a branch.
   *Done when:* it replaces `scripts/dev.ts`, `tsdown.config.ts` and the two tsconfigs with less
   code, keeping the CJS preload, inlined `VITE_API_BASE_URL` and restart-on-change. If it doesn't,
@@ -71,5 +75,7 @@ These rules are shared across the `template-*` repos and apply here too:
 - Dependency sweeps commit with a lowercase `setup:` or `chore(deps):` prefix. Nothing is pushed
   without the user's say-so.
 - **TypeScript 6** until `vue-tsc` supports TS 7, the same gate as `template-webapp-vuejs`.
+  Rechecked 2026-11-01: `typescript` 7.0.2 + `vue-tsc` 3.3.14 still fails with
+  `ERR_PACKAGE_PATH_NOT_EXPORTED`.
 - **Node 26 everywhere**, enforced by `devEngines`. CI upgrades to npm 12 before `npm ci` because
   Node 26 bundles npm 11. Any sibling adding `devEngines` needs the same step.
