@@ -1,6 +1,6 @@
 # Roadmap — template-desktop-electron
 
-An Electron 44 desktop template with the Vue 3 UI of `template-webapp-vuejs`, a keychain-backed
+An Electron 45 desktop template with the Vue 3 UI of `template-webapp-vuejs`, a keychain-backed
 session, native settings and GitHub Releases auto-update. Its UI (`src/`) is shared with
 `template-desktop-tauri`. This roadmap is a record of intent: items here are candidates, not
 commitments. Pick one up, or leave the repo as-is.
@@ -8,15 +8,15 @@ commitments. Pick one up, or leave the repo as-is.
 ## Now — parity + hardening, no new dependencies
 
 - **Persist window size and position.**
-  *Steps:* save `getBounds()` on `close` to `userData/window-state.json` via
+  _Steps:_ save `getBounds()` on `close` to `userData/window-state.json` via
   `writeJsonFileAtomic`. Restore it in `createMainWindow`, clamped to a visible display
   (`screen.getDisplayMatching`).
-  *Done when:* resizing, quitting and relaunching restores the window, and a disconnected
+  _Done when:_ resizing, quitting and relaunching restores the window, and a disconnected
   monitor doesn't strand it off-screen.
 
 - **Guard redirects the way navigation is guarded.** `window.ts` blocks `will-navigate` but not
   `will-redirect`. The UI never redirects, so the guard is cheap insurance.
-  *Done when:* `window.test.ts` pins both.
+  _Done when:_ `window.test.ts` pins both.
 
 - **Validate the login payload with Zod.** This is the same gap as in both webapps' roadmaps, and
   `zod` is already a dependency.
@@ -25,15 +25,19 @@ commitments. Pick one up, or leave the repo as-is.
 
 - **Standing item: recheck electron-vite on every sweep.** electron-vite 5 (stable) caps Vite at
   7, and 6.0 (Vite 8) was still beta when this repo was created. That's why `scripts/dev.ts` +
-  tsdown exist. Rechecked 2026-10-10: 6.0 is still beta (`6.0.0-beta.7`).
-  *Steps:* once `electron-vite@6` is stable, prototype it in a branch.
-  *Done when:* it replaces `scripts/dev.ts`, `tsdown.config.ts` and the two tsconfigs with less
+  tsdown exist. Rechecked 2026-11-01: `6.0.0` is stable (2026-10-14) but skipped this sweep.
+  [alex8088/electron-vite#929](https://github.com/alex8088/electron-vite/issues/929) reports
+  failures on this repo's Electron + Vite 8 stack and its fixes (#932, #934) are unmerged, and the
+  done-when below is unreachable as written: typecheck still needs both tsconfigs. Recheck once a
+  6.0.x lands those fixes.
+  _Steps:_ once `electron-vite@6` is stable, prototype it in a branch.
+  _Done when:_ it replaces `scripts/dev.ts`, `tsdown.config.ts` and the two tsconfigs with less
   code, keeping the CJS preload, inlined `VITE_API_BASE_URL` and restart-on-change. If it doesn't,
   record why here and drop the item.
 
 - **Playwright `_electron` E2E.** It covers login → restart → session restored from the keychain,
   menu → Settings, and theme persistence. The flow was verified by hand when the repo was created.
-  *Note:* the `EnableNodeCliInspectArguments` fuse is off, so Playwright can only drive unpackaged
+  _Note:_ the `EnableNodeCliInspectArguments` fuse is off, so Playwright can only drive unpackaged
   builds (`npm start`), not `release/` apps. That's intended.
 
 - **Wire up code signing.** The secrets are listed, commented out, in `release.yml`. The macOS
@@ -71,5 +75,7 @@ These rules are shared across the `template-*` repos and apply here too:
 - Dependency sweeps commit with a lowercase `setup:` or `chore(deps):` prefix. Nothing is pushed
   without the user's say-so.
 - **TypeScript 6** until `vue-tsc` supports TS 7, the same gate as `template-webapp-vuejs`.
+  Rechecked 2026-11-01: `typescript` 7.0.2 + `vue-tsc` 3.3.14 still fails with
+  `ERR_PACKAGE_PATH_NOT_EXPORTED`.
 - **Node 26 everywhere**, enforced by `devEngines`. CI upgrades to npm 12 before `npm ci` because
   Node 26 bundles npm 11. Any sibling adding `devEngines` needs the same step.

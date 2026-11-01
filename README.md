@@ -1,6 +1,6 @@
 # template-desktop-electron
 
-A production-grade Electron desktop template with a Vue 3 + TypeScript UI. It uses Electron 44, a
+A production-grade Electron desktop template with a Vue 3 + TypeScript UI. It uses Electron 45, a
 Vite 8 renderer, tsdown-built main and preload bundles, and electron-builder installers.
 
 The UI carries full parity with `template-webapp-vuejs`: JWT auth with refresh-token rotation,
@@ -15,19 +15,19 @@ The `src/` UI is shared with its sibling `template-desktop-tauri` (see
 
 ## Toolchain
 
-| Tool | Role |
-| --- | --- |
-| [Electron](https://www.electronjs.org) 44 | Desktop shell: Chromium 152 + Node 24.21 |
-| [Vite](https://vitejs.dev) 8 | UI dev server (HMR) and renderer build |
-| [tsdown](https://tsdown.dev) | Main and preload bundles, built by Rolldown (Rust). Same tool as `template-webserver-ts7`; the preload is emitted as CJS because sandboxed preloads can't load ES modules |
-| [electron-builder](https://www.electron.build) | Installers (dmg/zip, NSIS, AppImage/deb), fuses, GitHub Releases publishing |
-| [electron-updater](https://www.electron.build/auto-update) | Auto-update from the GitHub Releases feed |
-| [electron-log](https://github.com/megahertz/electron-log) | Main-process logging to the OS log directory, with rotation |
-| [vue-tsc](https://github.com/vuejs/language-tools) + `tsc` | Typecheck: vue-tsc for the UI, plain tsc for `electron/`. Held at TypeScript 6 for the same reason as `template-webapp-vuejs`: vue-tsc can't load TS 7 yet |
-| [Biome](https://biomejs.dev) | Lint + format (no ESLint, no Prettier) |
-| [Vitest](https://vitest.dev) + [@vue/test-utils](https://test-utils.vuejs.org) + [MSW](https://mswjs.io) | Unit tests in two projects: `ui` (jsdom) and `main` (Node, with `electron` mocked) |
-| [lefthook](https://github.com/evilmartians/lefthook) | Git hooks (pre-commit lint) |
-| [Tailwind CSS v4](https://tailwindcss.com) | Styling, via `@tailwindcss/vite` |
+| Tool                                                                                                     | Role                                                                                                                                                                      |
+| -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Electron](https://www.electronjs.org) 45                                                                | Desktop shell: Chromium 156 + Node 24.22                                                                                                                                  |
+| [Vite](https://vitejs.dev) 8                                                                             | UI dev server (HMR) and renderer build                                                                                                                                    |
+| [tsdown](https://tsdown.dev)                                                                             | Main and preload bundles, built by Rolldown (Rust). Same tool as `template-webserver-ts7`; the preload is emitted as CJS because sandboxed preloads can't load ES modules |
+| [electron-builder](https://www.electron.build)                                                           | Installers (dmg/zip, NSIS, AppImage/deb), fuses, GitHub Releases publishing                                                                                               |
+| [electron-updater](https://www.electron.build/auto-update)                                               | Auto-update from the GitHub Releases feed                                                                                                                                 |
+| [electron-log](https://github.com/megahertz/electron-log)                                                | Main-process logging to the OS log directory, with rotation                                                                                                               |
+| [vue-tsc](https://github.com/vuejs/language-tools) + `tsc`                                               | Typecheck: vue-tsc for the UI, plain tsc for `electron/`. Held at TypeScript 6 for the same reason as `template-webapp-vuejs`: vue-tsc can't load TS 7 yet                |
+| [Biome](https://biomejs.dev)                                                                             | Lint + format (no ESLint, no Prettier)                                                                                                                                    |
+| [Vitest](https://vitest.dev) + [@vue/test-utils](https://test-utils.vuejs.org) + [MSW](https://mswjs.io) | Unit tests in two projects: `ui` (jsdom) and `main` (Node, with `electron` mocked)                                                                                        |
+| [lefthook](https://github.com/evilmartians/lefthook)                                                     | Git hooks (pre-commit lint)                                                                                                                                               |
+| [Tailwind CSS v4](https://tailwindcss.com)                                                               | Styling, via `@tailwindcss/vite`                                                                                                                                          |
 
 ## Requirements
 
@@ -48,21 +48,21 @@ npm run dev
 
 An app window opens. Sign in with `demo@example.com` / `password123`; the dev server answers with
 the mock API, so no backend is needed. The first `npm run dev` downloads the Electron binary:
-Electron 44 fetches it lazily rather than in an install script.
+Electron 45 fetches it lazily rather than in an install script.
 
 ## Scripts
 
-| Script | Description |
-| --- | --- |
-| `npm run dev` | Vite dev server + tsdown watch + Electron. Restarts Electron when main or preload changes; UI edits hot-reload |
-| `npm run build` | Typecheck, then `vite build` (→ `dist/renderer`), then `tsdown` (→ `dist-electron`) |
-| `npm start` | Run the built app unpackaged, loading from `app://`, as a packaged build would |
-| `npm run dist` | `build`, then electron-builder for the current OS (→ `release/`) |
-| `npm run typecheck` | `vue-tsc --noEmit` (UI) and `tsc --noEmit -p electron` (main, preload, scripts) |
-| `npm run lint` / `lint:fix` / `lint:ci` | Biome check / fix / CI mode (no writes; fails on any issue) |
-| `npm run format` | Format all files with Biome |
-| `npm test` / `test:watch` / `test:coverage` | Vitest once / watch / with enforced coverage thresholds |
-| `npm run prepare` | Install lefthook git hooks (runs automatically after `npm install`) |
+| Script                                      | Description                                                                                                    |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`                               | Vite dev server + tsdown watch + Electron. Restarts Electron when main or preload changes; UI edits hot-reload |
+| `npm run build`                             | Typecheck, then `vite build` (→ `dist/renderer`), then `tsdown` (→ `dist-electron`)                            |
+| `npm start`                                 | Run the built app unpackaged, loading from `app://`, as a packaged build would                                 |
+| `npm run dist`                              | `build`, then electron-builder for the current OS (→ `release/`)                                               |
+| `npm run typecheck`                         | `vue-tsc --noEmit` (UI) and `tsc --noEmit -p electron` (main, preload, scripts)                                |
+| `npm run lint` / `lint:fix` / `lint:ci`     | Biome check / fix / CI mode (no writes; fails on any issue)                                                    |
+| `npm run format`                            | Format all files with Biome                                                                                    |
+| `npm test` / `test:watch` / `test:coverage` | Vitest once / watch / with enforced coverage thresholds                                                        |
+| `npm run prepare`                           | Install lefthook git hooks (runs automatically after `npm install`)                                            |
 
 ## Environment configuration
 
@@ -223,19 +223,19 @@ these differ:
 Kebab-case filenames with a role suffix. UI code imports through the `@/` alias, and `electron/`
 uses relative imports.
 
-| Suffix | Role |
-| --- | --- |
-| `*.view.vue` | Routed page component |
-| `*.component.vue` | Reusable (non-routed) component |
-| `*.store.ts` | Pinia store |
-| `*.api.ts` | Typed call group (HTTP or native) |
-| `*.client.ts` | Low-level transport (HTTP client) |
-| `*.plugin.ts` | Vite plugin (dev/build tooling, runs in Node) |
-| `*.ipc.ts` | Main-process IPC handler group for one domain |
-| `*.contract.ts` | Cross-process contract (channels + types) |
-| `*.util.ts` | Framework-agnostic helper |
-| `*.types.ts` | Shared TypeScript types |
-| `*.test.ts` | Unit test, in `src/tests/` or `electron/tests/`, mirroring the source tree |
+| Suffix            | Role                                                                       |
+| ----------------- | -------------------------------------------------------------------------- |
+| `*.view.vue`      | Routed page component                                                      |
+| `*.component.vue` | Reusable (non-routed) component                                            |
+| `*.store.ts`      | Pinia store                                                                |
+| `*.api.ts`        | Typed call group (HTTP or native)                                          |
+| `*.client.ts`     | Low-level transport (HTTP client)                                          |
+| `*.plugin.ts`     | Vite plugin (dev/build tooling, runs in Node)                              |
+| `*.ipc.ts`        | Main-process IPC handler group for one domain                              |
+| `*.contract.ts`   | Cross-process contract (channels + types)                                  |
+| `*.util.ts`       | Framework-agnostic helper                                                  |
+| `*.types.ts`      | Shared TypeScript types                                                    |
+| `*.test.ts`       | Unit test, in `src/tests/` or `electron/tests/`, mirroring the source tree |
 
 ## Code style consistency
 

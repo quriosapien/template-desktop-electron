@@ -5,7 +5,7 @@ name: Release
 # GitHub Release. Publishing the draft is what makes electron-updater see it.
 on:
   push:
-    tags: ['v*']
+    tags: ["v*"]
 
 permissions:
   contents: write # electron-builder creates the draft release and uploads assets
@@ -34,7 +34,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version-file: '.nvmrc'
+          node-version-file: ".nvmrc"
           package-manager-cache: false
 
       - name: Upgrade npm
@@ -44,8 +44,8 @@ jobs:
       - name: Cache npm
         uses: actions/setup-node@v7
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
+          node-version-file: ".nvmrc"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci

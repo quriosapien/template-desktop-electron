@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { createSecretsHandlers, createSecretsStore } from '../../../main/ipc/secrets.ipc';
@@ -6,13 +6,23 @@ import { AppError } from '../../../main/utils/app-error.util';
 import { IPC } from '../../../shared/ipc.contract';
 import { useTempDir } from '../../support/temp-dir';
 
+const reverse = (text: string) => [...text].reverse().join('');
+/** Ciphertext as if written under a since-rotated key: readable, but due for re-encryption. */
+const rotatedCiphertext = (text: string) => Buffer.from(`old:${reverse(text)}`).toString('base64');
+
 /** Reversible stand-in for safeStorage: prefixes and reverses the text. */
-function fakeSafeStorage(options: { available?: boolean; backend?: string } = {}) {
+function fakeSafeStorage(
+  options: { available?: boolean; backend?: string; beforeDecrypt?: () => Promise<void> } = {},
+) {
   return {
-    isEncryptionAvailable: () => options.available ?? true,
+    isAsyncEncryptionAvailable: async () => options.available ?? true,
     getSelectedStorageBackend: () => options.backend ?? 'gnome_libsecret',
-    encryptString: (text: string) => Buffer.from(`enc:${[...text].reverse().join('')}`),
-    decryptString: (buffer: Buffer) => [...buffer.toString().slice(4)].reverse().join(''),
+    encryptStringAsync: async (text: string) => Buffer.from(`enc:${reverse(text)}`),
+    decryptStringAsync: async (buffer: Buffer) => {
+      await options.beforeDecrypt?.();
+      const text = buffer.toString();
+      return { result: reverse(text.slice(4)), shouldReEncrypt: text.startsWith('old:') };
+    },
   };
 }
 
@@ -67,6 +77,49 @@ describe('createSecretsStore', () => {
       '2',
       '3',
     ]);
+  });
+
+  it('re-encrypts a secret that safeStorage flags as due for re-encryption', async () => {
+    const { store, filePath } = makeStore();
+    await writeFile(
+      filePath,
+      JSON.stringify({ 'refresh-token': rotatedCiphertext('super-secret') }),
+    );
+
+    expect(await store.get('refresh-token')).toBe('super-secret');
+
+    const onDisk = JSON.parse(await readFile(filePath, 'utf8'));
+    expect(Buffer.from(onDisk['refresh-token'], 'base64').toString()).toBe(
+      `enc:${reverse('super-secret')}`,
+    );
+    expect(await store.get('refresh-token')).toBe('super-secret');
+  });
+
+  it('does not let a re-encryption overwrite a newer write', async () => {
+    let reachedDecrypt = () => {};
+    const atDecrypt = new Promise<void>((resolve) => {
+      reachedDecrypt = resolve;
+    });
+    let release = () => {};
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const { store, filePath } = makeStore({
+      beforeDecrypt: () => {
+        reachedDecrypt();
+        return gate;
+      },
+    });
+    await writeFile(filePath, JSON.stringify({ 'refresh-token': rotatedCiphertext('old-token') }));
+
+    // get() has read the old ciphertext and is mid-decrypt when the set lands.
+    const pending = store.get('refresh-token');
+    await atDecrypt;
+    await store.set('refresh-token', 'new-token');
+    release();
+
+    expect(await pending).toBe('old-token');
+    expect(await store.get('refresh-token')).toBe('new-token');
   });
 
   it('refuses when OS encryption is unavailable', async () => {

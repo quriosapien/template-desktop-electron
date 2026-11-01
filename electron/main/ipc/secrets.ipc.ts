@@ -3,10 +3,11 @@ import { IPC } from '../../shared/ipc.contract';
 import { AppError } from '../utils/app-error.util';
 import { createSerialQueue, readJsonFile, writeJsonFileAtomic } from '../utils/json-file.util';
 
+/** The async safeStorage API: Electron 45 deprecates the sync one and Electron 46 removes it. */
 type SafeStorageLike = {
-  isEncryptionAvailable(): boolean;
-  encryptString(plainText: string): Buffer;
-  decryptString(encrypted: Buffer): string;
+  isAsyncEncryptionAvailable(): Promise<boolean>;
+  encryptStringAsync(plainText: string): Promise<Buffer>;
+  decryptStringAsync(encrypted: Buffer): Promise<{ shouldReEncrypt: boolean; result: string }>;
   getSelectedStorageBackend(): string;
 };
 
@@ -26,8 +27,8 @@ export function createSecretsStore(deps: {
 }) {
   const serial = createSerialQueue();
 
-  const assertAvailable = () => {
-    if (!deps.safeStorage.isEncryptionAvailable()) {
+  const assertAvailable = async () => {
+    if (!(await deps.safeStorage.isAsyncEncryptionAvailable())) {
       throw new AppError('unsupported', 'OS keychain encryption is unavailable.');
     }
     // Linux with no secret service falls back to a hard-coded key: that's
@@ -41,29 +42,44 @@ export function createSecretsStore(deps: {
   };
 
   const readAll = () => readJsonFile(deps.filePath, secretsFileSchema, {});
+  const encrypt = async (value: string) =>
+    (await deps.safeStorage.encryptStringAsync(value)).toString('base64');
 
   return {
     async get(key: unknown): Promise<string | null> {
       const validKey = secretKey.parse(key);
-      assertAvailable();
+      await assertAvailable();
       const encrypted = (await readAll())[validKey];
-      return encrypted ? deps.safeStorage.decryptString(Buffer.from(encrypted, 'base64')) : null;
+      if (!encrypted) return null;
+      const { result, shouldReEncrypt } = await deps.safeStorage.decryptStringAsync(
+        Buffer.from(encrypted, 'base64'),
+      );
+      if (shouldReEncrypt) {
+        // The OS key rotated or got stronger: store the value under the current key.
+        await serial(async () => {
+          const all = await readAll();
+          if (all[validKey] !== encrypted) return; // a newer set/delete won the race
+          all[validKey] = await encrypt(result);
+          await writeJsonFileAtomic(deps.filePath, all);
+        });
+      }
+      return result;
     },
 
     async set(key: unknown, value: unknown): Promise<void> {
       const validKey = secretKey.parse(key);
       const validValue = secretValue.parse(value);
-      assertAvailable();
+      await assertAvailable();
       return serial(async () => {
         const all = await readAll();
-        all[validKey] = deps.safeStorage.encryptString(validValue).toString('base64');
+        all[validKey] = await encrypt(validValue);
         await writeJsonFileAtomic(deps.filePath, all);
       });
     },
 
     async delete(key: unknown): Promise<void> {
       const validKey = secretKey.parse(key);
-      assertAvailable();
+      await assertAvailable();
       return serial(async () => {
         const all = await readAll();
         if (validKey in all) {
