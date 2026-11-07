@@ -5,6 +5,7 @@ Vite 8 renderer, tsdown-built main and preload bundles, and electron-builder ins
 
 The UI carries full parity with `template-webapp-vuejs`: JWT auth with refresh-token rotation,
 guarded routes, Pinia and Tailwind CSS v4. On top of that sits a desktop layer:
+
 - the refresh token lives in the **OS keychain**, not localStorage;
 - settings are persisted natively and applied natively;
 - a native menu, safe external links, and a single-instance lock;
@@ -190,12 +191,14 @@ Set the repo variable `VITE_API_BASE_URL` (Settings → Variables) so release bu
 API URL.
 
 **Signing** is opt-in; the environment block in `release.yml` lists the secrets.
+
 - **Unsigned macOS builds:** ad-hoc signed (`resetAdHocDarwinSignature`), so they run on Apple
   silicon. **macOS cannot apply auto-updates to an app that isn't Developer ID–signed**, and
   Gatekeeper warns on first launch.
 - **Unsigned Windows builds:** they update fine, but SmartScreen warns on first launch.
 
 To sign:
+
 1. Add `CSC_LINK` and `CSC_KEY_PASSWORD`, plus `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD` and
    `APPLE_TEAM_ID` for notarization.
 2. Uncomment their lines in `release.yml`.
@@ -213,6 +216,7 @@ node -e "require('sharp')('build/icon.svg').resize(1024,1024).png().toFile('buil
 
 Both desktop templates keep `src/` identical, so UI work moves between them by copying files. Only
 these differ:
+
 - `src/api/native.api.ts` and its test: the shell binding.
 - The `VITE_APP_NAME` default in `src/config/env.ts` and its test.
 - The accent colour in `src/styles/index.css`.
