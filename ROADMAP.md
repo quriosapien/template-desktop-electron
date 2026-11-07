@@ -25,15 +25,26 @@ commitments. Pick one up, or leave the repo as-is.
 
 - **Standing item: recheck electron-vite on every sweep.** electron-vite 5 (stable) caps Vite at
   7, and 6.0 (Vite 8) was still beta when this repo was created. That's why `scripts/dev.ts` +
-  tsdown exist. Rechecked 2026-11-01: `6.0.0` is stable (2026-10-14) but skipped this sweep.
+  tsdown exist. `6.0.0` went stable on 2026-10-14 but is skipped:
   [alex8088/electron-vite#929](https://github.com/alex8088/electron-vite/issues/929) reports
   failures on this repo's Electron + Vite 8 stack and its fixes (#932, #934) are unmerged, and the
-  done-when below is unreachable as written: typecheck still needs both tsconfigs. Recheck once a
-  6.0.x lands those fixes.
+  done-when below is unreachable as written: typecheck still needs both tsconfigs. Rechecked
+  2026-11-07: no change (still `6.0.0`, #929 open, #932 and #934 unmerged). Recheck once a 6.0.x
+  lands those fixes.
   _Steps:_ once `electron-vite@6` is stable, prototype it in a branch.
   _Done when:_ it replaces `scripts/dev.ts`, `tsdown.config.ts` and the two tsconfigs with less
   code, keeping the CJS preload, inlined `VITE_API_BASE_URL` and restart-on-change. If it doesn't,
   record why here and drop the item.
+
+- **Standing item: recheck electron-builder 27 on every sweep.** electron-builder 26 still pulls
+  in `@electron/get@3` (got 11) and `@electron/universal@2.0.3`, which carries a dev-only minimatch
+  advisory. 27 moves to `@electron/get@5`, `@electron/asar@4` and `@electron/universal@3`. (The
+  `http-cache-semantics` advisory that `@electron/get@3` used to raise is no longer reported.)
+  npm's `latest` tag lags, so sweeps take the newest `26.x` / `6.x` from the `v26` dist-tag.
+  Rechecked 2026-11-07: still alpha (`27.0.0-alpha.14`, with `electron-updater`
+  `7.0.0-alpha.13`).
+  _Done when:_ 27 is stable and `electron-builder` + `electron-updater` 7 are adopted, with the
+  config migrated and a `npm run dist` build launched.
 
 - **Playwright `_electron` E2E.** It covers login → restart → session restored from the keychain,
   menu → Settings, and theme persistence. The flow was verified by hand when the repo was created.
@@ -75,7 +86,7 @@ These rules are shared across the `template-*` repos and apply here too:
 - Dependency sweeps commit with a lowercase `setup:` or `chore(deps):` prefix. Nothing is pushed
   without the user's say-so.
 - **TypeScript 6** until `vue-tsc` supports TS 7, the same gate as `template-webapp-vuejs`.
-  Rechecked 2026-11-01: `typescript` 7.0.2 + `vue-tsc` 3.3.14 still fails with
+  Rechecked 2026-11-07: `typescript` 7.0.2 + `vue-tsc` 3.3.14 still fails with
   `ERR_PACKAGE_PATH_NOT_EXPORTED`.
 - **Node 26 everywhere**, enforced by `devEngines`. CI upgrades to npm 12 before `npm ci` because
   Node 26 bundles npm 11. Any sibling adding `devEngines` needs the same step.
