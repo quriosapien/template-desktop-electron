@@ -5,6 +5,7 @@ Guidance for anyone working in this repo, including AI coding assistants.
 ## What this repo is
 
 A **scaffold**, not a product. It has three reference features:
+
 - **Auth:** login, keychain-persisted refresh token, and a guarded dashboard.
 - **Settings:** a theme persisted and applied natively.
 - **Updates:** check and install from GitHub Releases.
@@ -71,7 +72,7 @@ the expected reason, then write the minimal code to pass.
 
 - **Packaged builds can't log in until `VITE_API_BASE_URL` points at a real backend.** The mock
   API only exists on the dev server.
-- **`Update check failed: 404`** until the GitHub repo exists and has a *published* release.
+- **`Update check failed: 404`** until the GitHub repo exists and has a _published_ release.
 - **Unsigned macOS builds are ad-hoc signed** (`resetAdHocDarwinSignature`). They run, but cannot
   auto-update. That is Squirrel.Mac's rule, not a bug here.
 - **On Linux without a keyring, sessions don't survive a restart** (the `unsupported` →
